@@ -1,0 +1,26 @@
+Index: requirements.txt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>booleano==1.1a2\r\ncomtypes==1.2.0\r\nnumpy==1.26.2\r\nosgeo4w_installer==1.4.0\r\nPyMuPDF==1.23.7\r\nPyMuPDFb==1.23.7\r\npyparsing==3.1.1\r\nscipy==1.11.4\r\nshapely==2.0.2\r\nshapely-ext==0.1.5\r\nshapely-extra==0.1.0\r\nshapely-geojson==0.0.1\r\nshapelyM==0.0.5b2\r\nshapelyutils==0.2.0\r\nsix==1.16.0\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-16LE
+===================================================================
+diff --git a/requirements.txt b/requirements.txt
+--- a/requirements.txt	(revision ae13745773e37a9849f48d960fd50d843e65c29a)
++++ b/requirements.txt	(date 1748449784458)
+@@ -1,15 +1,0 @@
+-booleano==1.1a2
+-comtypes==1.2.0
+-numpy==1.26.2
+-osgeo4w_installer==1.4.0
+-PyMuPDF==1.23.7
+-PyMuPDFb==1.23.7
+-pyparsing==3.1.1
+-scipy==1.11.4
+-shapely==2.0.2
+-shapely-ext==0.1.5
+-shapely-extra==0.1.0
+-shapely-geojson==0.0.1
+-shapelyM==0.0.5b2
+-shapelyutils==0.2.0
+-six==1.16.0
