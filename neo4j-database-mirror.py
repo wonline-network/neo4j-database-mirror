@@ -1,4 +1,4 @@
-# Wonline - Configuración de la migración de base de datos neo4j comunity edition
+# Wonline - Configuración de la migración de base de datos neo4j community edition
 # Autor: Angel Luis
 # Versión: 1.0.0
 # Web: https://wonline.network
@@ -7,6 +7,7 @@
 from neo4j import GraphDatabase
 from dotenv import load_dotenv
 import os
+from tqdm import tqdm  # Para la barra de progreso
 
 # Cargar las variables de entorno
 load_dotenv()
@@ -33,30 +34,39 @@ try:
     def clear_target_db():
         target_session.run("MATCH (n) DETACH DELETE n")
 
-    # Función para copiar nodos
+    # Función para copiar nodos con barra de progreso y ETA
     def copy_nodes():
-        print("Copia copy_nodes.")
+        # Obtener total de nodos
+        total_nodes = source_session.run("MATCH (n) RETURN count(n) AS c").single()["c"]
+        print(f"Copiando {total_nodes} nodos...")
         result = source_session.run("MATCH (n) RETURN n")
-        for record in result:
+        # Barras de progreso con tqdm
+        for record in tqdm(result, total=total_nodes, desc="Nodos", unit="node"):
             node = record["n"]
-            properties = node.items()
-            create_query = f"CREATE (n:{':'.join(node.labels)} {{{', '.join([f'{k}: ${k}' for k in node.keys()])}}})"
+            # Construir query de creación
+            create_query = (
+                f"CREATE (n:{':'.join(node.labels)} "
+                f"{{{', '.join([f'{k}: ${k}' for k in node.keys()])}}})"
+            )
             target_session.run(create_query, **node)
 
-    # Función para copiar relaciones
+    # Función para copiar relaciones con barra de progreso y ETA
     def copy_relationships():
-        print("Copia copy_relationships")
+        # Obtener total de relaciones
+        total_rels = source_session.run("MATCH ()-[r]->() RETURN count(r) AS c").single()["c"]
+        print(f"Copiando {total_rels} relaciones...")
         result = source_session.run("MATCH ()-[r]->() RETURN r")
-        for record in result:
-            relationship = record["r"]
-            start_node_id = relationship.start_node.id
-            end_node_id = relationship.end_node.id
-            properties = relationship.items()
+        for record in tqdm(result, total=total_rels, desc="Relaciones", unit="rel"):
+            r = record["r"]
+            start_id = r.start_node.id
+            end_id = r.end_node.id
             create_query = (
-                f"MATCH (a), (b) WHERE id(a) = {start_node_id} AND id(b) = {end_node_id} "
-                f"CREATE (a)-[r:{relationship.type} {{{', '.join([f'{k}: ${k}' for k in relationship.keys()])}}}]->(b)"
+                f"MATCH (a), (b) "
+                f"WHERE id(a) = {start_id} AND id(b) = {end_id} "
+                f"CREATE (a)-[rel:{r.type} "
+                f"{{{', '.join([f'{k}: ${k}' for k in r.keys()])}}}]->(b)"
             )
-            target_session.run(create_query, **relationship)
+            target_session.run(create_query, **r)
 
     # Ejecutar las funciones para hacer la copia espejo
     clear_target_db()
